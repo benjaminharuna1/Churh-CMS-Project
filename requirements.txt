@@ -1,6 +1,9 @@
 dj-database-url
 Django
+django-heroku
+gunicorn
 Pillow
 psycopg2
 pytz
 sqlparse
+whitenoise
