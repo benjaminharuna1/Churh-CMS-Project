@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from Member.models import upload_image_path
+from member.models import upload_image_path
 
 
 class UserProfile(models.Model):

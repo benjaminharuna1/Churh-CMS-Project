@@ -1,9 +1,12 @@
-from django.contrib import admin
-from django.urls import path
-
-from .views import *
+from django.urls import path, re_path
+from member import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    
+
+    # The home page
+    path('', views.index, name='home'),
+
+    # Matches any html file
+    re_path(r'^.*\.*', views.pages, name='pages'),
+
 ]
