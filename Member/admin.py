@@ -23,7 +23,7 @@ class EducationInformationItemInline(admin.TabularInline):
 
 
 
-class MemberAdmin(admin.ModelAdmin):
+class MembershipAdmin(admin.ModelAdmin):
     search_fields = ('ID', 'first_name', 'last_name', 'other_names', 'active', 'sex', 'discipler', 'telephone', 'address', 'country', 'state_of_origin', 'lga', 'marital_status', 'spouse_name', 'next_of_kin', 'relationship_with_nok', 'number_of_children', 'address', 'date_joined', 'tribe', 'fathers_name', 'mothers_name', 'guardians_name', 'home_cell' )
     list_display = ('ID', 'first_name', 'last_name', 'other_names', 'active', 'sex', 'discipler', 'telephone', 'address', 'country', 'state_of_origin', 'lga', 'marital_status', 'spouse_name', 'next_of_kin', 'relationship_with_nok', 'number_of_children', 'address', 'date_joined', 'tribe', 'fathers_name', 'mothers_name', 'guardians_name', 'home_cell')
     list_filter = ('ID', 'first_name', 'last_name', 'other_names', 'active', 'sex', 'telephone', 'address', 'country', 'state_of_origin', 'lga', 'marital_status',    'date_joined', 'tribe',  "home_cell")
@@ -71,7 +71,7 @@ class EducationInformationAdmin(admin.ModelAdmin):
 
 
 
-admin.site.register(Member,MemberAdmin)
+admin.site.register(Membership,MembershipAdmin)
 admin.site.register(SubGroup, SubGroupAdmin)
 admin.site.register(MemberSubGroup, MemberSubGroupAdmin)
 admin.site.register(Committee, CommitteeAdmin)

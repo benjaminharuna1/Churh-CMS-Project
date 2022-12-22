@@ -15,13 +15,13 @@ from pathlib import Path
 from django.contrib import messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-g=n&xxzs#7bixbrbb_!u61updty13c*sp$113x+5&33j*2+4j^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
      # Custom Apps
     'users.apps.UsersConfig',
     'member.apps.MemberConfig',
+    'frontend',
     'phonenumber_field',
 ]
 
@@ -84,7 +85,7 @@ WSGI_APPLICATION = 'church.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 

@@ -1,10 +1,10 @@
+from contextlib import nullcontext
 import os, random
-
-
 from django.db import models
+from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
-
-
+from django.template.defaultfilters import slugify
+from django.utils import timezone
 
 def filename_ext(filepath):
     file_base = os.path.basename(filepath)
@@ -28,7 +28,7 @@ class Committee(models.Model):
     contact = PhoneNumberField(null=True, blank = True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
     
 
@@ -40,7 +40,7 @@ class SubGroup(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
     
 
 class HomeCell(models.Model):
@@ -50,7 +50,7 @@ class HomeCell(models.Model):
     contact = PhoneNumberField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
      
         
 class MemberManager(models.Manager):
@@ -69,11 +69,11 @@ class MemberManager(models.Manager):
 
    
 
-class Member(models.Model):
+class Membership(models.Model):
     ID = models.AutoField(primary_key=True)
     first_name = models.CharField('First Name', max_length=255)
     last_name = models.CharField('Last Name', max_length=255)
-    other_names = models.CharField('Other Names', max_length=255, blank=True, null=True)
+    other_names = models.CharField('Other Names', max_length=255, blank=True, null=True, )
     active = models.BooleanField()
 
 
@@ -88,7 +88,8 @@ class Member(models.Model):
 
     discipler = models.CharField(max_length=255, blank=True, null=True)
     telephone = PhoneNumberField(null=True, blank=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    date_of_birth = models.DateTimeField(auto_now_add=True,blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
     state_of_origin = models.CharField(max_length=255, blank=True, null=True)
     lga = models.CharField('Local Governemnt Area', max_length=255, blank=True, null=True)
@@ -126,39 +127,85 @@ class Member(models.Model):
     
     
     # uploads
-    picture = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    picture = models.ImageField(upload_to=upload_image_path,  null=True, blank=True)
     
     signature = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
-
-    
-  
     objects = MemberManager()
 
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name + ' ' + self.other_names
+    @property
+    def get_picture_url(self):
+        if self.picture and hasattr(self.picture, 'url'):
+            return self.picture.url
+        else: return "static\images\personalized\avatar.png"
+    
+    @property
+    def get_signature_url(self):
+        if self.picture and hasattr(self.signature, 'url'):
+            return self.signature.url
+        else: return "static\images\avatar01.png"
 
+   
+    def get_absolute_url(self):
+        return reverse('member_profile:member_profile', kwargs={'pk': self.pk})
+
+    def __str__(self):
+        "Returns member full name"
+        return f'{self.first_name} {self.last_name}  {self.other_names}'
+    
+    
+    
+    
+    
+    
+    
+
+
+    # def save(self, *args, **kwargs):
+    #     self.slug = slugify(self.email)
+    #     super().save(*args, **kwargs)
+    #     pass
+    
+    # def get_absolute_url(self):
+    #     return reverse("member:member_detail", kwargs={"slug": self.slug})
+    
+            
+    
+        
  
 
 class MemberCommittee(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.PROTECT)
+    member = models.ForeignKey(Membership, on_delete=models.CASCADE)
     committee = models.ForeignKey(Committee, on_delete=models.PROTECT)
+    
+    class Meta:
+        ordering = ["member"]       
 
+    def __str__(self):
+        return f'{self.member}'
+    
+    
 
 class MemberSubGroup(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.PROTECT, db_constraint=False)
+    member = models.ForeignKey(Membership, on_delete=models.CASCADE, db_constraint=False)
     subgroup = models.ForeignKey(SubGroup, on_delete=models.PROTECT, db_constraint=False)    
+
+    def __str__(self):
+        return f'{self.member}'
 
 
 
 class EmploymentDetails(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.PROTECT)
+    member = models.ForeignKey(Membership, on_delete=models.PROTECT)
     employer_name = models.CharField(primary_key=True, max_length=255)
     office_address = models.CharField(max_length=255, null=True, blank=True)
     years_in_employment = models.PositiveIntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return f'{self.member}'
+
 
 class EducationInformation(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.PROTECT)
+    member = models.ForeignKey(Membership, on_delete=models.PROTECT)
     school = models.CharField(primary_key=True, max_length=255)
     course = models.CharField(max_length=255, null=True, blank=True)
     start_year = models.PositiveIntegerField(blank=True, null=True)

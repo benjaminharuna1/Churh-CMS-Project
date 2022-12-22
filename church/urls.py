@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import member
 from member.views import *
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('about/', about, name='about'),
-    # path('', frontpage, name='frontpage'),
-    # path('home/', home, name='home'),
     path("", include("users.urls")), # Auth routes - login / register
-    path("", include("member.urls"))             # UI Kits Html files
+    path("", include("member.urls")),             # UI Kits Html files
+    
+   
+    
 ]
