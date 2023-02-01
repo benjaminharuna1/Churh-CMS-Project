@@ -1,16 +1,24 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} Profile {% endblock title %}
+{% block title %} Create New User {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
-<h1>From goes in here</h1>
+  <h1>Add Member Form</h1>
 
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.as_p}}
+      <button>Add Member</button>
+    </form>
 
    
+
+
+
       {% include "includes/footer.html" %}
 
     </div>

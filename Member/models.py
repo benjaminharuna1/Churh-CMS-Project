@@ -1,9 +1,9 @@
-from contextlib import nullcontext
+# from contextlib import nullcontext
 import os, random
 from django.db import models
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
-from django.template.defaultfilters import slugify
+# from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 def filename_ext(filepath):
@@ -21,26 +21,10 @@ def upload_image_path(instance, filename):
 
 
 
-class Committee(models.Model):
-    name = models.CharField(primary_key=True, max_length=255)
-    description = models.TextField()
-    leader = models.CharField(max_length=255)
-    contact = PhoneNumberField(null=True, blank = True)
 
-    def __str__(self):
-        return f'{self.name}'
 
     
 
-class SubGroup(models.Model):
-    name = models.CharField(primary_key=True, max_length=255)
-    description = models.TextField()
-    leader = models.CharField(max_length=255)
-    contact = PhoneNumberField(null=True, blank = True)
-
-
-    def __str__(self):
-        return f'{self.name}'
     
 
 class HomeCell(models.Model):
@@ -99,15 +83,17 @@ class Membership(models.Model):
     MARRIED = 'M'
     DIVORCED = 'D'
     WIDOWED = 'W'
+    SINGLE_PARENT = 'SP'
     STATUS = [
             (SINGLE, 'Single'),
             (MARRIED, 'Married'),
             (DIVORCED, 'Divorced'),
-            (WIDOWED, 'Widowed')
+            (WIDOWED, 'Widowed'),
+            (SINGLE_PARENT, 'Single_Parent'),
             ]
-    marital_status = models.CharField(max_length=1, choices=STATUS, default=SINGLE)
+    marital_status = models.CharField(max_length=2, choices=STATUS, default=SINGLE)
 
-    spouse_name = models.CharField('Spouse Name (Leave Blank if Single)', max_length=255, blank=True, null=True)
+    spouse_name = models.CharField('Spouse Name (Type Nill if Single)', max_length=255, blank=True, null=True)
     next_of_kin = models.CharField('Next of Kin', max_length = 255, blank=True, null=True)
     relationship_with_nok = models.CharField('Relationship with Next of Kin', max_length=255, blank=True, null=True)
     number_of_children= models.PositiveIntegerField('Number of children', blank=True, null=True)
@@ -130,13 +116,14 @@ class Membership(models.Model):
     picture = models.ImageField(upload_to=upload_image_path,  null=True, blank=True)
     
     signature = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
+    
     objects = MemberManager()
 
     @property
     def get_picture_url(self):
         if self.picture and hasattr(self.picture, 'url'):
             return self.picture.url
-        else: return "static\images\personalized\avatar.png"
+        else: return "static\images\avatar01.png"
     
     @property
     def get_signature_url(self):
@@ -146,7 +133,9 @@ class Membership(models.Model):
 
    
     def get_absolute_url(self):
-        return reverse('member_profile:member_profile', kwargs={'pk': self.pk})
+        # return reverse('member-list':'member-list', kwargs={'pk': self.pk})
+        return reverse('member-list')
+    
 
     def __str__(self):
         "Returns member full name"
@@ -170,27 +159,50 @@ class Membership(models.Model):
     
             
     
+class Committee(models.Model):
+    name = models.CharField(primary_key=True, max_length=255)
+    description = models.TextField()
+    leader = models.CharField(max_length=255)
+    contact = PhoneNumberField(null=True, blank = True)
+    members = models.ManyToManyField(Membership, through = 'MemberCommittee')
+
+    def __str__(self):
+        return f'{self.name}'
         
  
 
 class MemberCommittee(models.Model):
     member = models.ForeignKey(Membership, on_delete=models.CASCADE)
-    committee = models.ForeignKey(Committee, on_delete=models.PROTECT)
+    committee = models.ForeignKey(Committee, on_delete=models.PROTECT,)
     
     class Meta:
         ordering = ["member"]       
 
     def __str__(self):
         return f'{self.member}'
-    
+
+        
+
+class SubGroup(models.Model):
+    name = models.CharField(primary_key=True, max_length=255)
+    description = models.TextField()
+    leader = models.CharField(max_length=255)
+    contact = PhoneNumberField(null=True, blank = True)
+    members = models.ManyToManyField(Membership, through = 'MemberSubGroup')
+
+
+    def __str__(self):
+        return f'{self.name}'
+
     
 
 class MemberSubGroup(models.Model):
-    member = models.ForeignKey(Membership, on_delete=models.CASCADE, db_constraint=False)
-    subgroup = models.ForeignKey(SubGroup, on_delete=models.PROTECT, db_constraint=False)    
+    member = models.ForeignKey(Membership, on_delete=models.CASCADE)
+    subgroup = models.ForeignKey(SubGroup, on_delete=models.CASCADE)    
 
     def __str__(self):
         return f'{self.member}'
+    
 
 
 

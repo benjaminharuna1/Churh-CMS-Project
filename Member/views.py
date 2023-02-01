@@ -67,37 +67,20 @@ class MemberListView(ListView):
 
     def get_queryset(self):
         return Membership.objects.order_by('ID')
+    
 
-         
-# @login_required(login_url="/login/")
-# def member_profile(request,):
-#     template = "members/profile.html"
-#     membership = Membership.objects.active()
-#     member_sugroup = MemberSubGroup.objects.all()
-#     home_cell = HomeCell.objects.all()
-#     member_committee = MemberCommittee.objects.all()
-#     employment_details = EmploymentDetails.objects.all()
-#     education_information = EducationInformation.objects.all()
-#     profile = UserProfile.objects.get_or_create(user=request.user)
-#     context = {
-#         "profile": profile,
-#         "membership": membership, "member_sugroup": member_sugroup, "home_cell": home_cell, "member_committee": member_committee, "employment_details": employment_details, "education_information": education_information, "total": len(membership),
-#         "total_active": len(Membership.objects.active()),
-#         "total_delete": len(membership),
-#         "status": "all"
-#     }
-#     return render(request, template, context)
+
 
 
 @login_required(login_url="/login/")
 def member_profile(request, pk):
     template = "members/profile.html"
     membership = get_object_or_404(Membership, pk=pk)
-    member_sugroup = MemberSubGroup.objects.all()
+    member_sugroup = MemberSubGroup.objects.filter(member_id = pk)
     home_cell = HomeCell.objects.all()
-    member_committee = MemberCommittee.objects.all()
-    employment_details = EmploymentDetails.objects.all()
-    education_information = EducationInformation.objects.all()
+    member_committee = MemberCommittee.objects.filter(member_id = pk)
+    employment_details = EmploymentDetails.objects.get()
+    education_information = EducationInformation.objects.get()
     profile = UserProfile.objects.get_or_create(user=request.user)
     context = {
         "profile": profile,
@@ -132,3 +115,8 @@ def confirm_delete_member(request):
     context = {}
     return render(request, template, context)
 
+
+class AddMemberView(CreateView):
+    model = Membership
+    template_name = 'members/create.html'
+    fields = '__all__'
